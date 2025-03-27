@@ -2,6 +2,11 @@ import cv2
 import mediapipe as mp
 import joblib
 import numpy as np
+import pyttsx3
+
+# Inicializar o sintetizador de voz
+engine = pyttsx3.init()
+engine.setProperty('rate', 150)  # Velocidade da fala
 
 # Carregar o modelo treinado e o label encoder
 model = joblib.load("gesture_model.pkl")
@@ -14,6 +19,9 @@ hands = mp_hands.Hands(static_image_mode=False, max_num_hands=2, min_detection_c
 
 # Captura de vídeo
 cap = cv2.VideoCapture(0)
+
+# Variável para evitar repetição de fala
+last_spoken_gesture = None
 
 print("Pressione 'q' para sair")
 
@@ -41,6 +49,12 @@ while cap.isOpened():
             landmarks = np.array(landmarks).reshape(1, -1)
             prediction = model.predict(landmarks)
             gesture_name = label_encoder.inverse_transform(prediction)[0]
+
+            # Se o gesto for novo, falar
+            if gesture_name != last_spoken_gesture:
+                engine.say(gesture_name)
+                engine.runAndWait()
+                last_spoken_gesture = gesture_name  # Atualiza último gesto falado
 
     # Mostrar nome do gesto na tela
     cv2.putText(frame, f"Gesto: {gesture_name}", (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
