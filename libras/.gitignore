@@ -15,6 +15,10 @@ package-lock.json
 __pycache__/
 *.pyc
 venv/
+env/
+.env/
+.venv/
+
 
 # Pastas de compilação do GameMaker
 *.yyc
